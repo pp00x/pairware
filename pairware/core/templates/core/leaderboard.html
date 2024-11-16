@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h2>Leaderboard</h2>
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Items Given</th>
+            <th>Requests Fulfilled</th>
+        </tr>
+        {% for ranking in rankings %}
+            <tr>
+                <td>{{ ranking.user.username }}</td>
+                <td>{{ ranking.items_given }}</td>
+                <td>{{ ranking.requests_fulfilled }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">No rankings yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

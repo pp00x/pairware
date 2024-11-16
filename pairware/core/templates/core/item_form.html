@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h2>Post a New Item</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <datalist id="category-list">
+            {% for category in categories %}
+                <option value="{{ category }}">
+            {% endfor %}
+        </datalist>
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

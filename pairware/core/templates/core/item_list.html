@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h2>Available Items</h2>
+
+    <!-- Search Form -->
+    <form method="get" action="{% url 'item_list' %}">
+        <input type="text" name="q" placeholder="Search..." value="{{ query|default:'' }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% for item in page_obj %}
+            <li>
+                <h3>{{ item.category }}</h3>
+                <p>{{ item.description }}</p>
+                <p>Location: {{ item.location }}</p>
+                <img src="{{ item.image.url }}" alt="{{ item.description }}" width="200">
+                <p>Posted by: <a href="{% url 'user_profile' item.owner.username %}">{{ item.owner.username }}</a></p>
+                {% if user.is_authenticated and user != item.owner %}
+                    <a href="{% url 'send_message' item.id %}">Contact Owner</a>
+                {% elif user == item.owner %}
+                    <a href="{% url 'confirm_transaction' item.id %}">Confirm Transaction</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No items found.</p>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <span class="page-links">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ query }}&page=1">&laquo; first</a>
+                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">next</a>
+                <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock %}

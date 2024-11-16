@@ -1,0 +1,63 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pairware</title>
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+    <nav>
+        <!-- Navigation bar -->
+        <ul>
+            <li><a href="{% url 'item_list' %}">Home</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'item_create' %}">Post Item</a></li>i>
+                <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'user_profile' user.username %}">My Profile</a></li>
+                <li>
+                    <a href="{% url 'inbox' %}">
+                        Inbox
+                        {% if unread_messages_count > 0 %}
+                            (<strong>{{ unread_messages_count }}</strong>)
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'notifications' %}">
+                        Notifications
+                        {% if unread_notifications_count > 0 %}
+                            (<strong>{{ unread_notifications_count }}</strong>)
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

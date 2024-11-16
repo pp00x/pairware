@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h2>Your Notifications</h2>
+    {% if notifications %}
+        <ul>
+            {% for notification in notifications %}
+                <li>{{ notification.message }} - {{ notification.timestamp }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no new notifications.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h2>Your Inbox</h2>
+    <ul>
+        {% for message in messages %}
+            <li>
+                <strong>From:</strong> {{ message.sender.username }}<br>
+                <strong>Item:</strong> {{ message.item.category }} - {{ message.item.description }}<br>
+                <strong>Message:</strong> {{ message.content }}<br>
+                <strong>Sent on:</strong> {{ message.timestamp }}
+            </li>
+        {% empty %}
+            <p>No messages.</p>
+        {% endfor %}
+    </ul>
+{% endblock %}
