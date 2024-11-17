@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model  # Use this instead of User
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
@@ -13,6 +13,8 @@ from django import forms
 from .forms import CustomUserCreationForm, ItemForm, MessageForm
 from .models import Item, Message, UserRanking, Notification, CustomUser
 
+# Get the custom user model
+User = get_user_model()
 
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
@@ -31,7 +33,6 @@ def item_create(request):
             return redirect('item_list')
     else:
         form = ItemForm()
-    # Fetch existing categories for suggestions
     categories = Item.objects.values_list('category', flat=True).distinct()
     return render(request, 'core/item_form.html', {'form': form, 'categories': categories})
 
@@ -46,8 +47,7 @@ def item_list(request):
     else:
         items = Item.objects.all().order_by('-date_posted')
     
-    # Pagination
-    paginator = Paginator(items, 10)  # Show 10 items per page
+    paginator = Paginator(items, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -74,7 +74,6 @@ def send_message(request, item_id):
 @login_required
 def inbox(request):
     messages_received = request.user.received_messages.all().order_by('-timestamp')
-    # Mark all messages as read
     messages_received.update(is_read=True)
     return render(request, 'core/inbox.html', {'messages': messages_received})
 
@@ -83,11 +82,11 @@ def confirm_transaction(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     if request.user == item.owner:
         if request.method == 'POST':
-            # Update ranking
             ranking, created = UserRanking.objects.get_or_create(user=request.user)
             ranking.items_given += 1
             ranking.save()
-            # Notify the recipient
+            
+            # Update: Use get_user_model() here
             interested_users = User.objects.filter(sent_messages__item=item).distinct()
             for user in interested_users:
                 Notification.objects.create(
@@ -110,8 +109,7 @@ def username_recovery(request):
     if request.method == 'POST':
         email = request.POST['email']
         try:
-            user = CustomUser.objects.get(email=email)
-            # Send email with username
+            user = User.objects.get(email=email)  # Updated to use User = get_user_model()
             send_mail(
                 'Username Recovery',
                 f'Your username is {user.username}',
@@ -121,15 +119,13 @@ def username_recovery(request):
             )
             messages.success(request, 'An email with your username has been sent.')
             return redirect('username_recovery_done')
-        except CustomUser.DoesNotExist:
+        except User.DoesNotExist:
             messages.error(request, 'Email not found.')
-            return render(request, 'registration/username_recovery.html')
     return render(request, 'registration/username_recovery.html')
-
 
 @login_required
 def user_profile(request, username):
-    user = get_object_or_404(CustomUser, username=username)
+    user = get_object_or_404(User, username=username)
     items = Item.objects.filter(owner=user).order_by('-date_posted')
     try:
         ranking = UserRanking.objects.get(user=user)
@@ -141,13 +137,8 @@ def user_profile(request, username):
         'ranking': ranking,
     })
 
-
 @login_required
 def notifications_view(request):
-    # Retrieve unread notifications
     notifications = request.user.notifications.filter(is_read=False).order_by('-timestamp')
-    
-    # Mark notifications as read
     notifications.update(is_read=True)
-    
     return render(request, 'core/notifications.html', {'notifications': notifications})
