@@ -8,9 +8,11 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django import forms
 
 from .forms import CustomUserCreationForm, ItemForm, MessageForm
 from .models import Item, Message, UserRanking, Notification, CustomUser
+
 
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm

@@ -1,12 +1,15 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    <h2>Confirm Transaction</h2>
-    <p>Are you sure you want to confirm the transaction for this item?</p>
-    <p><strong>{{ item.category }} - {{ item.description }}</strong></p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Confirm</button>
-        <a href="{% url 'item_list' %}">Cancel</a>
-    </form>
-{% endblock %}
+    <div class="max-w-md mx-auto text-center p-8 bg-white rounded-2xl shadow-sm">
+        <h2 class="mb-4">Confirm Transaction</h2>
+        <div class="item-card mb-4">
+            <h3 class="h5 mb-3">{{ item.category }}</h3>
+            <p class="text-secondary mb-4">{{ item.description }}</p>
+        </div>
+        <form method="post" class="d-flex gap-3 justify-content-center">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Confirm</button>
+            <a href="{% url 'item_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>

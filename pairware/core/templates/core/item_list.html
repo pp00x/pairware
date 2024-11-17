@@ -1,49 +1,74 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    <h2>Available Items</h2>
+    <h2 class="text-center mb-5">Discover Available Items</h2>
 
     <!-- Search Form -->
-    <form method="get" action="{% url 'item_list' %}">
-        <input type="text" name="q" placeholder="Search..." value="{{ query|default:'' }}">
-        <button type="submit">Search</button>
-    </form>
-
-    <ul>
-        {% for item in page_obj %}
-            <li>
-                <h3>{{ item.category }}</h3>
-                <p>{{ item.description }}</p>
-                <p>Location: {{ item.location }}</p>
-                <img src="{{ item.image.url }}" alt="{{ item.description }}" width="200">
-                <p>Posted by: <a href="{% url 'user_profile' item.owner.username %}">{{ item.owner.username }}</a></p>
-                {% if user.is_authenticated and user != item.owner %}
-                    <a href="{% url 'send_message' item.id %}">Contact Owner</a>
-                {% elif user == item.owner %}
-                    <a href="{% url 'confirm_transaction' item.id %}">Confirm Transaction</a>
-                {% endif %}
-            </li>
-        {% empty %}
-            <p>No items found.</p>
-        {% endfor %}
-    </ul>
-
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        <span class="page-links">
-            {% if page_obj.has_previous %}
-                <a href="?q={{ query }}&page=1">&laquo; first</a>
-                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">previous</a>
-            {% endif %}
-
-            <span class="current-page">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-
-            {% if page_obj.has_next %}
-                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">next</a>
-                <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
-        </span>
+    <div class="search-container text-center mb-5">
+        <form method="get" action="{% url 'item_list' %}" class="d-inline-flex gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Search items..." value="{{ query|default:'' }}" style="min-width: 300px;">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for item in page_obj %}
+            <div class="col">
+                <div class="item-card h-100">
+                    <img src="{{ item.image.url }}" alt="{{ item.description }}" class="item-image">
+                    <h3 class="h5 mb-3">{{ item.category }}</h3>
+                    <p class="text-secondary mb-3">{{ item.description }}</p>
+                    <p class="small text-muted mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                            <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                            <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
+                        {{ item.location }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'user_profile' item.owner.username %}" class="text-decoration-none">
+                            <span class="text-primary">{{ item.owner.username }}</span>
+                        </a>
+                        {% if user.is_authenticated and user != item.owner %}
+                            <a href="{% url 'send_message' item.id %}" class="btn btn-primary">Contact Owner</a>
+                        {% elif user == item.owner %}
+                            <a href="{% url 'confirm_transaction' item.id %}" class="btn btn-primary">Confirm Transaction</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-secondary">No items found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page=1">&laquo; First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
 {% endblock %}

@@ -1,15 +1,39 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    <h2>Post a New Item</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <datalist id="category-list">
-            {% for category in categories %}
-                <option value="{{ category }}">
-            {% endfor %}
-        </datalist>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="max-w-xl mx-auto">
+        <h2 class="text-center mb-5">Post a New Item</h2>
+        <div class="item-card">
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+                        {% if field.name == 'category' %}
+                            <input type="text" list="category-list" class="form-control" 
+                                   name="{{ field.name }}" id="{{ field.id_for_label }}">
+                            <datalist id="category-list">
+                                {% for category in categories %}
+                                    <option value="{{ category }}">
+                                {% endfor %}
+                            </datalist>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Post Item</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

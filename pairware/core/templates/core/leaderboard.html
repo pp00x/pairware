@@ -1,23 +1,45 @@
 {% extends 'core/base.html' %}
+{% load custom_filters %} 
 
 {% block content %}
-    <h2>Leaderboard</h2>
-    <table>
-        <tr>
-            <th>User</th>
-            <th>Items Given</th>
-            <th>Requests Fulfilled</th>
-        </tr>
-        {% for ranking in rankings %}
-            <tr>
-                <td>{{ ranking.user.username }}</td>
-                <td>{{ ranking.items_given }}</td>
-                <td>{{ ranking.requests_fulfilled }}</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">No rankings yet.</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <h2 class="text-center mb-5">Community Leaders</h2>
+    <div class="max-w-2xl mx-auto">
+        <div class="item-card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Items Given</th>
+                            <th scope="col">Requests Fulfilled</th>
+                            <th scope="col">Total Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ranking in rankings %}
+                            <tr class="fade-in" style="animation-delay: {{ forloop.counter0|multiply:0.1 }}s">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <a href="{% url 'user_profile' ranking.user.username %}" 
+                                       class="text-decoration-none">
+                                        {{ ranking.user.username }}
+                                    </a>
+                                </td>
+                                <td>{{ ranking.items_given }}</td>
+                                <td>{{ ranking.requests_fulfilled }}</td>
+                                <td>{{ ranking.items_given|add:ranking.requests_fulfilled }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-secondary p-5">
+                                    No rankings available yet
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

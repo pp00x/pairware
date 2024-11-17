@@ -1,7 +1,11 @@
+{# logout.html #}
 {% extends 'core/base.html' %}
-
 {% block content %}
+<div class="auth-container fade-in">
     <h2>Logged Out</h2>
-    <p>You have successfully logged out.</p>
-    <p><a href="{% url 'login' %}">Log in again?</a></p>
+    <div class="auth-card text-center">
+        <p class="mb-4">You have successfully logged out.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Log in again</a>
+    </div>
+</div>
 {% endblock %}

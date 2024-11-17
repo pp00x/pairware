@@ -1,11 +1,39 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    <h2>Send Message to {{ recipient.username }}</h2>
-    <p>Regarding Item: {{ item.category }} - {{ item.description }}</p>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Send Message</button>
-    </form>
-{% endblock %}
+    <div class="max-w-xl mx-auto">
+        <h2 class="text-center mb-5">Contact About Item</h2>
+        <div class="item-card mb-4">
+            <div class="d-flex gap-4">
+                <img src="{{ item.image.url }}" alt="{{ item.description }}" 
+                     class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+                <div>
+                    <h3 class="h5 mb-2">{{ item.category }}</h3>
+                    <p class="text-secondary mb-1">{{ item.description }}</p>
+                    <p class="small text-muted mb-0">Posted by {{ recipient.username }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="item-card">
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Send Message</button>
+            </form>
+        </div>
+    </div>
